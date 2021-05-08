@@ -1,0 +1,25 @@
+__pycache__
+pythonenv*
+.python-version
+.coverage
+env
+.venv
+
+.vscode/*
+
+# HA stuff
+automations.yaml
+configuration.yaml
+groups.yaml
+home-assistant_v2.db
+home-assistant.log
+scenes.yaml
+scripts.yaml
+secrets.yaml
+deps/
+tts/
+www/
+.storage/
+.cloud/
+blueprints/
+.HA_VERSION

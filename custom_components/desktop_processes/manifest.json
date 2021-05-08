@@ -1,0 +1,15 @@
+{
+  "domain": "desktop_processes",
+  "name": "Desktop Processes",
+  "documentation": "https://github.com/gannonprudhomme/ha-desktop-processes",
+  "issue_tracker": "https://github.com/gannonprudhomme/ha-desktop-processes/issues",
+  "dependencies": [],
+  "config_flow": true,
+  "codeowners": [
+    "@gannonprudhomme"
+  ],
+  "requirements": [
+    "python-socketio[asyncio_client]==4.6.1"
+  ],
+  "verson": "0.1.0"
+}

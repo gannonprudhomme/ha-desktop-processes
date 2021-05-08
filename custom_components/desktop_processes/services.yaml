@@ -1,0 +1,18 @@
+set_process_volume:
+  name: Set Process Volume
+  description: Sets Process Volume
+  # If the service accepts entity IDs, target allows the user to specify entities by entity,
+  # device, or area. If `target` is specified, `entity_id` should not be defined in the `fields`
+  # map. By default it shows only targets matching entities from the same domain as the service,
+  # but if further customization is required, target supports the entity, device, and area selectors
+  # (https://www.home-assistant.io/docs/blueprint/selectors/). Entity selector parameters will
+  # automatically be applied to device and area, and device selector parameters will automatically be applied to area. ^
+  # target: # Allows the user to specify entitiyes by entyiy.
+  fields:
+    pid:
+      name: Process ID
+      description: process id
+      required: true
+      advanced: false
+      example: 123
+      # default: -1
