@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Dict
 from homeassistant.helpers.entity import Entity
@@ -11,9 +12,6 @@ import socketio
 from socketio.exceptions import ConnectionError
 
 from .const import DOMAIN
-
-# TODO Can we define this in the constuctor?
-sio = socketio.AsyncClient()
 
 ICON_PATH = "../../www/icons/"
 
@@ -35,7 +33,8 @@ class Desktop(Entity):
     def __init__(self, url: str, priorities: Dict[str, int], ignore_list: List[str]):
         """ Initialize the Desktop """
 
-        self._state = 123
+        self.sio = socketio.AsyncClient()
+        self._state = "disconnected"
         self.url = url
         self.processes = []
         self.priorities = priorities
@@ -44,17 +43,17 @@ class Desktop(Entity):
         # self.socket.send()
 
     async def connect(self):
-        @sio.event
+        @self.sio.event
         async def connect():
             print("entity connected\n")
 
-        @sio.event
+        @self.sio.event
         async def disconnect():
             print("entity disconnected\n")
 
         print(f"attempting to connect to {self.url}\n")
         # try:
-        await sio.connect(self.url)
+        await self.sio.connect(self.url)
         print("done connecting\n")
         # except ConnectionError as err:
         # print(err)
@@ -107,9 +106,11 @@ class Desktop(Entity):
                 dir = os.path.dirname(__file__)
                 # TODO: Define this elsewhere (and validate the path?)
                 # Also make the folder if it doesn't exist
-                filename = os.path.join(dir, "..", "..", "www", "icons", f"{name}.png")
+                path = os.path.join(dir, "..", "..", "www", "icons")
+                if not os.path.exists(path):
+                    Path(path).mkdir(parents=True, exist_ok=True)
 
-                # TODO: Need to create the www/icons folder automatically
+                filename = os.path.join(path, f"{name}.png")
 
                 with open(filename, "wb+") as f:
                     f.write(data)
@@ -130,17 +131,17 @@ class Desktop(Entity):
             for proc in self.processes:
                 if not "name" in proc:  # Will this ever work???? Can we use .get()?
                     pass
-                name = proc["name"]
-                await sio.emit("get_volume_icon", name, None, get_volume_icon(name))
+                name = proc.get("name")
+                await self.sio.emit("get_volume_icon", name, None, get_volume_icon(name))
 
-        await sio.emit("get_volumes", "something", None, get_volumes)
+        await self.sio.emit("get_volumes", "something", None, get_volumes)
 
-        # Make a socket request
-        self._state = 23
+        # Update state so attributes are updated?
+        self._state = "connected"
 
     async def set_volume(self, pid: int, volume: int):
-        if not sio.connected:
+        if not self.sio.connected:
             print("Not connected!")
         # TODO: Probably need to validate pid and volume
 
-        await sio.emit("set_volume_proc", {"pid": pid, "volume": volume})
+        await self.sio.emit("set_volume_proc", {"pid": pid, "volume": volume})
