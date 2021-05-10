@@ -4,7 +4,29 @@
 
 Integration to read from process volumes from Desktop Control Tablet Server and store it in an entity.
 
-## Configuration is done in the UI
+## Additional Configuration
+
+You can add the integration through Home Assistant's UI.
+
+Additional, you can add the following to your `configuration.yaml`:
+
+```yaml
+desktop_processes:
+  scanning_interval: 5 # in seconds, defaults to 10
+  ignore: # The display names of the programs you want to be ignored
+    - svchost
+    - nvcontainer
+    - NVIDIA Broadcast
+
+  # Determines sort priority, descending
+  priority:
+    - name: Spotify
+      priority: 2
+    - name: Discord
+      priority: 1
+    - name: chrome
+      priority: -1
+```
 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/gannonprudhomme/ha-desktop-processes.svg?style=for-the-badge
 [commits]: https://github.com/gannonprudhomme/ha-desktop-processes/commits/main
