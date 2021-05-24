@@ -6,14 +6,10 @@ import voluptuous as vol
 from homeassistant import config_entries, core, exceptions
 
 import socketio
-from .const import DOMAIN  # pylint:disable=unused-import
+from .const import DOMAIN
 from .desktop import Desktop
 
 _LOGGER = logging.getLogger(__name__)
-
-# TODO: Add default port???
-STEP_USER_DATA_SCHEMA = vol.Schema({"url": str})
-
 
 class PlaceholderHub:
     """Placeholder class to make tests pass.
@@ -44,11 +40,9 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         })
 
         if user_input is None:
-            print("is none")
             return self.async_show_form(
                 step_id="user", data_schema=data_schema
             )
-        print("in body")
 
         # Verify that we can connect to this URL? Or nah?
         if "url" not in user_input:
@@ -60,11 +54,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         sio = socketio.AsyncClient()
 
         try:
-            print("trying to connect")
             await sio.connect(url)
-            print("worked, disconnecting")
             await sio.disconnect()
-            print("disconnected")
             return self.async_create_entry(title=f"DP: {url}", data={"url": url})
         except socketio.exceptions.ConnectionError as err:
             print(err)

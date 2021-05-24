@@ -9,7 +9,7 @@
     "@gannonprudhomme"
   ],
   "requirements": [
-    "python-socketio[asyncio_client]==4.6.1"
+    "python-socketio[asyncio_client]==5.3.0"
   ],
-  "verson": "0.1.0"
+  "version": "0.1.0"
 }

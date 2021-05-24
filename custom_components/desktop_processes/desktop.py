@@ -1,4 +1,5 @@
 import os
+import logging
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Dict
@@ -15,6 +16,7 @@ from .const import DOMAIN
 
 ICON_PATH = "../../www/icons/"
 
+_LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class Process:
@@ -45,16 +47,17 @@ class Desktop(Entity):
     async def connect(self):
         @self.sio.event
         async def connect():
-            print("entity connected\n")
+            _LOGGER.info(f"Connected to {self.url}")
 
         @self.sio.event
         async def disconnect():
-            print("entity disconnected\n")
+            # print("disconnected")
+            _LOGGER.info(f"Disconnected from {self.url}")
 
-        print(f"attempting to connect to {self.url}\n")
+        # print(f"attempting to connect to {self.url}\n")
+        _LOGGER.info(f"Attempting to connect to {self.url}")
         # try:
         await self.sio.connect(self.url)
-        print("done connecting\n")
         # except ConnectionError as err:
         # print(err)
         # pass
