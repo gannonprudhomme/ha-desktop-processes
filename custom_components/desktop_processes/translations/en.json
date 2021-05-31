@@ -3,15 +3,14 @@
     "step": {
       "user": {
         "title": "Desktop Processes",
-        "description": "If you need help with the configuration have a look here: https://github.com/gannonprudhomme/desktop-processes",
+        "description": "Enter the Desktop Processes Server Socket.IO URL.",
         "data": {
-          "username": "Username",
-          "password": "Password"
+          "url": "URL"
         }
       }
     },
     "error": {
-      "auth": "Username/Password is wrong."
+      "did_not_connect": "Cannot connect to the given URL."
     },
     "abort": {
       "single_instance_allowed": "Only a single instance is allowed."

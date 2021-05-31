@@ -30,11 +30,15 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Desktop Processes."""
 
     VERSION = 1
-    # TODO pick one of the available connection classes in homeassistant/config_entries.py
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
+
+        if self._async_current_entries():
+            _LOGGER.warn("Only a single instance is allowed.")
+            return self.async_abort(reason="single_instance_allowed")
+
         data_schema = vol.Schema({
             vol.Required("url", default="http://localhost:3001/"): str
         })
@@ -44,25 +48,25 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 step_id="user", data_schema=data_schema
             )
 
-        # Verify that we can connect to this URL? Or nah?
-        if "url" not in user_input:
-            # raise some error?
-            pass
-
         url = user_input.get("url")
 
         sio = socketio.AsyncClient()
 
         try:
+            # Connect to make sure it's a valid URL
+            # If it isn't, connect will throw a ConnectionError
             await sio.connect(url)
+            # Disconnect now that we know it is
             await sio.disconnect()
-            return self.async_create_entry(title=f"DP: {url}", data={"url": url})
+            return self.async_create_entry(title=f"{url}", data={"url": url})
         except socketio.exceptions.ConnectionError as err:
-            print(err)
-            errors = { "base": "auth_error" }
-            return self.async_show_form(step_id="user", data_schema=data_schema, errors=errors)
+            _LOGGER.exception(err)
+            errors = { "url": "did_not_connect" }
+            return self.async_show_form(
+                step_id="user", data_schema=data_schema, errors=errors
+            )
         except Exception as e:
-            print(e)
+            _LOGGER.exception(e)
 
 # Really the only error we need
 class CannotConnect(exceptions.HomeAssistantError):
