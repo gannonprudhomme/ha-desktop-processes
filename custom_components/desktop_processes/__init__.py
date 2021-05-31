@@ -5,6 +5,7 @@ from datetime import timedelta
 from typing import List
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.helpers.entity_component import EntityComponent
 import socketio
@@ -66,10 +67,6 @@ async def async_setup_entry(hass: HomeAssistant, entry):
     if config_data and CONF_SCAN_INTERVAL in config_data:
         scan_interval = config_data.get(CONF_SCAN_INTERVAL) or SCANNING_INTERVAL
 
-    if not "url" in entry.data:
-        print("something went wrong\n")
-        return False
-
     url = entry.data.get("url")
 
     desktop = Desktop(url, priorities, ignore_list)
@@ -84,10 +81,24 @@ async def async_setup_entry(hass: HomeAssistant, entry):
     component = EntityComponent(
         None, DOMAIN, hass, timedelta(seconds=scan_interval)
     )
+
+    # Store the component so we can remove the Entity in async_unload_entry
+    hass.data[DOMAIN]["component"] = component
+
     await component.async_add_entities([desktop])
 
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """ Handle removal of entry """
-    # TODO: Need to figure out how to a remove an entry
+    # Get the according component so we can get the entities it contains
+    component = hass.data[DOMAIN]["component"]
+
+    # Must convert it to a list, otherwise we'll get a "dict size changed during iteration"
+    entities = list(component.entities)
+
+    # There will only be one, but iterate anyways
+    for entity in entities:
+        await component.async_remove_entity(entity.entity_id)
+
+    return True
