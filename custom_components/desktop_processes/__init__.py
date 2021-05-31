@@ -33,12 +33,9 @@ async def _set_process_volume(call: ServiceCall):
     desktop = desktops[0]
     await desktop.set_volume(pid, volume)
 
-
 @asyncio.coroutine
 async def async_setup(hass: HomeAssistant, config: dict):
     """ Set up the Desktop Processes component. """
-    print("\nasync_setup\n")
-
     # Setup data so we can pass the config data to async_setup_entry
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN] = {}
@@ -48,11 +45,8 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
     return True
 
-
 async def async_setup_entry(hass: HomeAssistant, entry):
     """ Setup from config entry """
-    print("\nasync_setup_entry\n")
-
     config_data = hass.data[DOMAIN].get(ATTR_CONFIG)
 
     ignore_list = []
@@ -67,8 +61,13 @@ async def async_setup_entry(hass: HomeAssistant, entry):
             setting["name"]: setting.get("priority") for setting in priority_settings
         }
 
+    scan_interval = SCANNING_INTERVAL
+
+    if config_data and CONF_SCAN_INTERVAL in config_data:
+        scan_interval = config_data.get(CONF_SCAN_INTERVAL) or SCANNING_INTERVAL
+
     if not "url" in entry.data:
-        print("shit went wrong\n")
+        print("something went wrong\n")
         return False
 
     url = entry.data.get("url")
@@ -77,13 +76,13 @@ async def async_setup_entry(hass: HomeAssistant, entry):
     try:
         await desktop.connect()
     except socketio.exceptions.ConnectionError as err:
-        print(err)
+        _LOGGER.error(err)
         return False
 
     desktops.append(desktop)
 
     component = EntityComponent(
-        None, DOMAIN, hass, timedelta(seconds=SCANNING_INTERVAL)
+        None, DOMAIN, hass, timedelta(seconds=scan_interval)
     )
     await component.async_add_entities([desktop])
 
