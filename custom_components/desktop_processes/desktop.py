@@ -51,16 +51,14 @@ class Desktop(Entity):
 
         @self.sio.event
         async def disconnect():
-            # print("disconnected")
             _LOGGER.info(f"Disconnected from {self.url}")
 
-        # print(f"attempting to connect to {self.url}\n")
         _LOGGER.info(f"Attempting to connect to {self.url}")
-        # try:
-        await self.sio.connect(self.url)
-        # except ConnectionError as err:
-        # print(err)
-        # pass
+        try:
+            await self.sio.connect(self.url)
+            _LOGGER.info("Connected to server at URL %s", self.url)
+        except ConnectionError as err:
+            _LOGGER.error("Cannot connect to server at URL %s", self.url)
 
     @property
     def device_info(self):
@@ -137,10 +135,26 @@ class Desktop(Entity):
                 name = proc.get("name")
                 await self.sio.emit("get_volume_icon", name, None, get_volume_icon(name))
 
-        await self.sio.emit("get_volumes", "something", None, get_volumes)
+        # Attempt to connect to the server if we aren't already connected
+        if not self.sio.connected:
+            await self.connect()
 
-        # Update state so attributes are updated?
-        self._state = "connected"
+            # If it's not connected after this, don't continue
+            if not self.sio.connected:
+                # Potentially redundant, see disconnect handler
+                self.processes = []
+                self._state = "disconnected"
+                return
+
+        try:
+            await self.sio.emit("get_volumes", "something", None, get_volumes)
+            self._state = "connected"
+        # This won't happen anymore b/c of the connected check, but leaving it here anyways
+        except socketio.exceptions.BadNamespaceError as err:
+            _LOGGER.error("Desktop Processes server is not active at URL %s", self.url)
+
+            self.processes = []
+            self._state = "disconnected"
 
     async def set_volume(self, pid: int, volume: int):
         if not self.sio.connected:

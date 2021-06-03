@@ -70,11 +70,7 @@ async def async_setup_entry(hass: HomeAssistant, entry):
     url = entry.data.get("url")
 
     desktop = Desktop(url, priorities, ignore_list)
-    try:
-        await desktop.connect()
-    except socketio.exceptions.ConnectionError as err:
-        _LOGGER.error(err)
-        return False
+    await desktop.connect()
 
     desktops.append(desktop)
 
