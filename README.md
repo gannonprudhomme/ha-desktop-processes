@@ -13,11 +13,11 @@ Home Assistant custom integration for retrieving and controlling process volumes
 
     b. In the dropdown on the top right, click `Custom repositories`
 
-    c. In the `Add custom repository URL` field, enter `https://github.com/gannonprudhomme/Desktop-Control-Panel`
+    c. In the `Add custom repository URL` field, enter `https://github.com/gannonprudhomme/ha-desktop-processes`
     and for `category` enter `Integration`.
 
     d. The repository should appear as a `New repository` on the `Integration` screen. If it doesn't,
-    go to `+ Explore & Add Repositories` then search for it.
+    go to `+ Explore & Add Repositories` then search for it. You'll then need to restart HA.
 
     e. Then click `Install` to install it into `config/custom_components`
 

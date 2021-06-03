@@ -3,5 +3,5 @@
   "hacs": "1.6.0",
   "domains": [],
   "iot_class": "?",
-  "homeassistant": "0.118.0"
+  "homeassistant": "2021.5.5"
 }
