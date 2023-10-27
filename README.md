@@ -5,7 +5,7 @@ Home Assistant custom integration for retrieving and controlling process volumes
 
 ## Installation (via HACS)
 
-0. The project is added as a custom repository from [HACS](), so make sure you have that installed first.
+0. The project is added as a custom repository from [HACS](https://hacs.xyz/), so make sure you have that installed first.
 
 1. Add it as a custom repository in HACS:
 
@@ -31,7 +31,7 @@ below Configuration step.
 
 You can add the integration through Home Assistant's UI.
 
-Additional, you can add the following to your `configuration.yaml`:
+Additionally, you can add the following to your `configuration.yaml`:
 
 ```yaml
 desktop_processes:
